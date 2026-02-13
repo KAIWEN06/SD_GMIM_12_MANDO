@@ -10,46 +10,31 @@ const API_URL =
 function loadSiswa() {
   let kelas = document.getElementById("kelas").value;
 
-  // Kalau belum pilih kelas
-  if (!kelas) {
-    document.getElementById("daftarSiswa").innerHTML =
-      "<p class='text-muted'>Silakan pilih kelas terlebih dahulu.</p>";
-    return;
-  }
+  if (!kelas) return;
 
-  // Loading text
-  document.getElementById("daftarSiswa").innerHTML =
-    "<p>⏳ Memuat daftar siswa...</p>";
+  let script = document.createElement("script");
 
-  // Fetch data siswa dari Apps Script
-  fetch(API_URL + "?kelas=" + kelas)
-    .then(response => response.json())
-    .then(data => {
-      // Kalau tidak ada siswa
-      if (data.length === 0) {
-        document.getElementById("daftarSiswa").innerHTML =
-          "<p class='text-danger'>Tidak ada siswa di kelas ini.</p>";
-        return;
-      }
+  script.src = API_URL + "?kelas=" + kelas + "&callback=tampilkanSiswa";
 
-      // Buat list siswa
-      let html = "";
+  document.body.appendChild(script);
+}
 
-      data.forEach(siswa => {
-        html += `
-          <div class="border rounded p-2 mb-2">
-            <b>${siswa.nama}</b>
+function tampilkanSiswa(data) {
+  let html = "";
 
-            <select class="form-select mt-2 status"
-              data-id="${siswa.id_siswa}">
-              <option value="Hadir">Hadir</option>
-              <option value="Izin">Izin</option>
-              <option value="Sakit">Sakit</option>
-              <option value="Alfa">Alfa</option>
-            </select>
-          </div>
-        `;
-      });
+  data.forEach(siswa => {
+    html += `
+      <div class="border rounded p-2 mb-2">
+        <b>${siswa.nama}</b>
+        <select class="form-select mt-2 status" data-id="${siswa.id_siswa}">
+          <option>Hadir</option>
+          <option>Izin</option>
+          <option>Sakit</option>
+          <option>Alfa</option>
+        </select>
+      </div>
+    `;
+  });
 
       // Tampilkan ke halaman
       document.getElementById("daftarSiswa").innerHTML = html;
@@ -113,3 +98,4 @@ function simpanAbsensi() {
       console.error("Error simpan absensi:", error);
     });
 }
+
